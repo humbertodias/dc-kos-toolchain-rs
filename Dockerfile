@@ -55,6 +55,8 @@ RUN apk add --no-cache \
     && chmod -R a+rX /opt/toolchains
 
 # Musl host: rustup's gnu binaries do not run on this Alpine image.
+# The musl target links libc statically by default and then rejects dylibs.
+# rustc_codegen_gcc is a shared library, so the host target must link musl dynamically.
 RUN arch="$(uname -m)" \
     && case "${arch}" in \
          x86_64) rust_host=x86_64-unknown-linux-musl ;; \
@@ -66,7 +68,15 @@ RUN arch="$(uname -m)" \
             --default-host "${rust_host}" \
             --default-toolchain none \
             --profile minimal \
-            --no-modify-path
+            --no-modify-path \
+    && mkdir -p /opt/cargo \
+    && printf '%s\n' \
+        '[target.x86_64-unknown-linux-musl]' \
+        'rustflags = ["-C", "target-feature=-crt-static"]' \
+        '' \
+        '[target.aarch64-unknown-linux-musl]' \
+        'rustflags = ["-C", "target-feature=-crt-static"]' \
+        > /opt/cargo/config.toml
 
 RUN git clone --depth 1 https://github.com/dreamcast-rs/rust-for-dreamcast.git /opt/toolchains/dc/rust \
     && git clone --depth 1 https://github.com/dreamcast-rs/KallistiOS.git /opt/toolchains/dc/rust/kos
