@@ -95,18 +95,23 @@ RUN set -e \
         /opt/cargo/registry \
         /opt/cargo/git \
     && find /opt/toolchains/dc/rust -name .git -type d -prune -print0 | xargs -0 rm -rf \
-    && chmod -R a+rX /opt/toolchains /opt/cargo /opt/rustup
+    && chmod -R a+rX /opt/toolchains /opt/cargo /opt/rustup \
+    && for cmd in rustup rustc cargo rustdoc; do \
+         ln -sfn "/opt/cargo/bin/${cmd}" "/usr/local/bin/${cmd}"; \
+       done
 
 RUN cat > /usr/local/bin/rust-kos-entry.sh <<'EOF'
 #!/bin/bash
 . /opt/toolchains/dc/rust/misc/environ.sh
+# KallistiOS environ appends its own bins but does not keep the Rust host tools.
+export PATH="/opt/cargo/bin:${PATH}"
 export LD_LIBRARY_PATH="${KOS_CC_BASE}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 exec "$@"
 EOF
 RUN chmod a+x /usr/local/bin/rust-kos-entry.sh \
     && touch /root/.bashrc \
-    && printf '\n# Rust for Dreamcast overrides the stock KOS environ.\n. /opt/toolchains/dc/rust/misc/environ.sh\nexport LD_LIBRARY_PATH="${KOS_CC_BASE}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"\n' >> /root/.bashrc \
-    && printf '\n. /opt/toolchains/dc/rust/misc/environ.sh\nexport LD_LIBRARY_PATH="${KOS_CC_BASE}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"\n' >> /etc/profile
+    && printf '\n# Rust for Dreamcast overrides the stock KOS environ.\n. /opt/toolchains/dc/rust/misc/environ.sh\nexport PATH="/opt/cargo/bin:${PATH}"\nexport LD_LIBRARY_PATH="${KOS_CC_BASE}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"\n' >> /root/.bashrc \
+    && printf '\n. /opt/toolchains/dc/rust/misc/environ.sh\nexport PATH="/opt/cargo/bin:${PATH}"\nexport LD_LIBRARY_PATH="${KOS_CC_BASE}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"\n' >> /etc/profile
 
 WORKDIR /src
 ENTRYPOINT ["/usr/local/bin/rust-kos-entry.sh"]
