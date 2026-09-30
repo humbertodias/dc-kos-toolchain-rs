@@ -50,6 +50,8 @@ RUN apk add --no-cache \
         python3 \
         pkgconf \
     && git config --system --add safe.directory '*' \
+    && git config --system user.name "dc-kos-toolchain-rs" \
+    && git config --system user.email "dc-kos-toolchain-rs@localhost" \
     && chmod -R a+rX /opt/toolchains
 
 # Musl host: rustup's gnu binaries do not run on this Alpine image.
