@@ -73,7 +73,7 @@ RUN /opt/toolchains/dc/rust/misc/install-toolchain.sh -j"${JOBS}"
 
 RUN set -e \
     && source /opt/toolchains/dc/rust/misc/environ.sh \
-    && make -C "$${KOS_BASE}" -j"${JOBS}" \
+    && make -C /opt/toolchains/dc/rust/kos -j"${JOBS}" \
     && /opt/toolchains/dc/rust/misc/install-rust.sh \
     && rm -rf \
         /opt/toolchains/dc/rust/kos/utils/dc-chain/build \
