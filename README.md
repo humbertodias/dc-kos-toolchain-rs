@@ -1,3 +1,6 @@
+[![Deploy](https://github.com/humbertodias/dc-kos-toolchain-rs/actions/workflows/deploy.yml/badge.svg)](https://github.com/humbertodias/dc-kos-toolchain-rs/actions/workflows/deploy.yml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/hldtux/dc-kos-toolchain-rs.svg?logo=docker)](https://hub.docker.com/r/hldtux/dc-kos-toolchain-rs)
+
 # dc-kos-toolchain-rs
 
 KallistiOS Dreamcast toolchain with Rust (`rustc_codegen_gcc`).
